@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace Xaamin\Whatsapi\Clients;
 
 use Closure;
@@ -26,59 +26,52 @@ class MGP25 implements WhatsapiInterface
 
     /**
      * Message manager
-     * 
+     *
      * @var \Xaamin\Whatsapi\Whatsapi\MessageManager
      */
     protected $manager;
 
     /**
      * Holds connect status
-     * 
+     *
      * @var boolean
      */
     protected $connected = false;
 
     /**
      * Holds SessionInterface implementation
-     * 
+     *
      * @var Xaamin\Whatsapi\Sessions\SessionInterface
      */
     protected $session;
 
     /**
      * Holds event listener
-     * 
+     *
      * @var \Xaamin\Whatsapi\Events\Listener
      */
     protected $walistener;
 
     /**
      * Información about account login
-     * 
+     *
      * @var array
      */
     protected $account = [];
 
     /**
      * Configuration variables
-     * 
+     *
      * @var array
      */
     protected $config = [];
 
     /**
      * Will be used broadcast to send messages?
-     * 
-     * @var boolean
-     */
-    protected $broadcast = false;
-    
-    /**
-     * Never let logoff happens
      *
      * @var boolean
      */
-    protected $canLogout = true;
+    protected $broadcast = false;
 
     /**
      * @param WhatsProt $whatsProt
@@ -116,8 +109,8 @@ class MGP25 implements WhatsapiInterface
 
     /**
      * Sets the Whatsapi event listener
-     * 
-     * @param  \Xaamin\Whatsapi\Contracts\ListenerInterface $listener 
+     *
+     * @param  \Xaamin\Whatsapi\Contracts\ListenerInterface $listener
      * @return void
      */
     public function setListener(ListenerInterface $listener)
@@ -127,12 +120,12 @@ class MGP25 implements WhatsapiInterface
 
     /**
      * Returns current WhatsProt instance
-     * 
+     *
      * @return WhatsProt
      */
     public function gateway()
     {
-        $this->connectAndLogin();
+//        $this->connectAndLogin();
         return $this->whatsProt;
     }
 
@@ -147,7 +140,7 @@ class MGP25 implements WhatsapiInterface
         {
             throw new Exception('Callback is not a function or isn\'t callable');
         }
-            
+
         call_user_func($callback, $this->manager);
 
         return $this->processAllMessages();
@@ -155,21 +148,21 @@ class MGP25 implements WhatsapiInterface
 
     /**
      * Process all messages types
-     * 
+     *
      * @return array
      */
     private function processAllMessages()
-    { 
+    {
         $processed = [];
 
         $receivers = $this->receivers();
 
         $messages = $this->manager->getMessages();
-        
+
         foreach ($receivers as $receiver)
-        {   
+        {
             foreach ($messages as $index => $message)
-            {                
+            {
                 $this->composition($receiver, $message);
 
                 $id = $this->sendMessage($receiver, $message);
@@ -206,7 +199,7 @@ class MGP25 implements WhatsapiInterface
 
     /**
      * Select the best way to send messages and send them returning the MessageID
-     * 
+     *
      * @param  string|array $receiver
      * @param  stdClass $message
      * @return string
@@ -219,37 +212,37 @@ class MGP25 implements WhatsapiInterface
         {
             case 'text':
                 $id = $this->broadcast
-                        ? $this->gateway()->sendBroadcastMessage($receiver, $message->message)
-                        : $this->gateway()->sendMessage($receiver, $message->message);
+                    ? $this->gateway()->sendBroadcastMessage($receiver, $message->message)
+                    : $this->gateway()->sendMessage($receiver, $message->message);
                 break;
             case 'image':
                 $id = $this->broadcast
-                        ? $this->gateway()->sendBroadcastImage($receiver, $message->file, false, $message->filesize, $message->hash, $message->caption)
-                        : $this->gateway()->sendMessageImage($receiver, $message->file, false, $message->filesize, $message->hash, $message->caption);
+                    ? $this->gateway()->sendBroadcastImage($receiver, $message->file, false, $message->filesize, $message->hash, $message->caption)
+                    : $this->gateway()->sendMessageImage($receiver, $message->file, false, $message->filesize, $message->hash, $message->caption);
                 break;
             case 'audio':
                 $id = $this->broadcast
-                        ? $this->gateway()->sendBroadcastAudio($receiver, $message->file, false, $message->filesize, $message->hash)
-                        : $this->gateway()->sendMessageAudio($receiver, $message->file, false, $message->filesize, $message->hash);
+                    ? $this->gateway()->sendBroadcastAudio($receiver, $message->file, false, $message->filesize, $message->hash)
+                    : $this->gateway()->sendMessageAudio($receiver, $message->file, false, $message->filesize, $message->hash);
                 break;
             case 'video':
                 $id = $this->broadcast
-                        ? $this->gateway()->sendBroadcastVideo($receiver, $message->file, false, $message->filesize, $message->hash, $message->caption)
-                        : $this->gateway()->sendMessageVideo($receiver, $message->file, false, $message->filesize, $message->hash, $message->caption);
+                    ? $this->gateway()->sendBroadcastVideo($receiver, $message->file, false, $message->filesize, $message->hash, $message->caption)
+                    : $this->gateway()->sendMessageVideo($receiver, $message->file, false, $message->filesize, $message->hash, $message->caption);
                 break;
             case 'location':
-                $id = $this->broadcast 
-                        ? $this->gateway()->sendBroadcastLocation($receiver, $message->longitude, $message->latitude, $message->caption, $message->url)
-                        : $this->gateway()->sendMessageLocation($receiver, $message->longitude, $message->latitude, $message->caption, $message->url);
+                $id = $this->broadcast
+                    ? $this->gateway()->sendBroadcastLocation($receiver, $message->longitude, $message->latitude, $message->caption, $message->url)
+                    : $this->gateway()->sendMessageLocation($receiver, $message->longitude, $message->latitude, $message->caption, $message->url);
                 break;
             case 'vcard':
-                $id = $this->broadcast 
-                        ? $this->gateway()->sendBroadcastVcard($receiver, $message->name, $message->vcard->show())
-                        : $this->gateway()->sendVcard($receiver, $message->name, $message->vcard->show());
+                $id = $this->broadcast
+                    ? $this->gateway()->sendBroadcastVcard($receiver, $message->name, $message->vcard->show())
+                    : $this->gateway()->sendVcard($receiver, $message->name, $message->vcard->show());
                 break;
             default:
-                            
-            break;
+
+                break;
         }
 
         while ($this->gateway()->pollMessage());
@@ -259,7 +252,7 @@ class MGP25 implements WhatsapiInterface
 
     /**
      * Set receivers in a broadcast array if needed
-     * 
+     *
      * @return array
      */
     private function receivers()
@@ -295,7 +288,7 @@ class MGP25 implements WhatsapiInterface
 
     /**
      * Smart composition before sending messages
-     * 
+     *
      * @param  string|array  $receiver
      * @param  stdClass $message
      * @return void
@@ -305,7 +298,7 @@ class MGP25 implements WhatsapiInterface
         if(!$this->broadcast)
         {
             $this->typing($receiver);
-            
+
             sleep($this->manager->composition($message));
 
             $this->paused($receiver);
@@ -314,7 +307,7 @@ class MGP25 implements WhatsapiInterface
 
     /**
      * Set the chat status to "Online"
-     * 
+     *
      * @return void
      */
     public function online()
@@ -325,7 +318,7 @@ class MGP25 implements WhatsapiInterface
     /**
      * Set the chat status available for chat.
      * Sets then nickname if provided
-     * 
+     *
      * @param $nickname
      * @return void
      */
@@ -336,7 +329,7 @@ class MGP25 implements WhatsapiInterface
 
     /**
      * Send the offline status. User will show up as "Offline".
-     * 
+     *
      * @return void
      */
     public function offline()
@@ -367,15 +360,15 @@ class MGP25 implements WhatsapiInterface
     }
 
     /**
-     * Send presence subscription, automatically receive presence 
+     * Send presence subscription, automatically receive presence
      * updates as long as the socket is open.
-     * 
+     *
      * @param  string|array $to
      * @return void
      */
     public function subscribe($to)
     {
-        foreach ((array) $to as $phone) 
+        foreach ((array) $to as $phone)
         {
             $this->gateway()->sendPresenceSubscription($phone);
         }
@@ -383,13 +376,13 @@ class MGP25 implements WhatsapiInterface
 
     /**
      * Unsubscribe, will stop subscription.
-     * 
+     *
      * @param  string|array $to
      * @return void
      */
     public function unsubscribe($to)
     {
-        foreach ((array) $to as $phone) 
+        foreach ((array) $to as $phone)
         {
             $this->gateway()->sendPresenceUnsubscription($phone);
         }
@@ -397,7 +390,7 @@ class MGP25 implements WhatsapiInterface
 
     /**
      * Set chat status to "Typing"
-     * 
+     *
      * @param  string $to
      * @return void
      */
@@ -408,7 +401,7 @@ class MGP25 implements WhatsapiInterface
 
     /**
      * Set chat status to "Paused"
-     * 
+     *
      * @param string $to
      * @return void
      */
@@ -423,7 +416,7 @@ class MGP25 implements WhatsapiInterface
     public function getNewMessages()
     {
         while ($this->gateway()->pollMessage());
-        
+
         $messages = $this->gateway()->getMessages();
 
         return $this->manager->transformMessages($messages);
@@ -431,64 +424,61 @@ class MGP25 implements WhatsapiInterface
 
     /**
      * Connect to Whatsapp server and Login
-     * 
+     *
      * @return void
      */
     public function connectAndLogin()
     {
-        if(!$this->connected)
-        {
-            $account = $this->config["default"];
+//        if(!$this->connected)
+//        {
+        $account = $this->config["default"];
+        $this->whatsProt->connect();
+        $this->whatsProt->loginWithPassword($this->password);
+        $this->whatsProt->sendGetClientConfig();
+        $this->whatsProt->sendGetPrivacyBlockedList();
+        $this->whatsProt->sendAvailableForChat($this->config["accounts"][$account]['nickname']);
+        $this->connected = true;
 
-            $this->whatsProt->connect();
-            $this->whatsProt->loginWithPassword($this->password);
-            $this->whatsProt->sendGetClientConfig();
-            $this->whatsProt->sendGetServerProperties();
-            $this->whatsProt->sendGetGroups();
-            $this->whatsProt->sendGetBroadcastLists();
-            $this->whatsProt->sendGetPrivacyBlockedList();
-            $this->whatsProt->sendAvailableForChat($this->config["accounts"][$account]['nickname']);
-            $this->connected = true;
-        }
+//        }
+    }
+
+    /**
+     * Connect to Whatsapp server and Login at first time !
+     *
+     * @return void
+     */
+    public function firstLogin()
+    {
+        $account = $this->config["default"];
+
+        $this->whatsProt->connect();
+        $this->whatsProt->loginWithPassword($this->password);
+        $this->whatsProt->sendGetClientConfig();
+        $this->whatsProt->sendGetServerProperties();
+        $this->whatsProt->sendGetGroups();
+        $this->whatsProt->sendGetBroadcastLists();
+        $this->whatsProt->sendGetPrivacyBlockedList();
+        $this->whatsProt->sendAvailableForChat($this->config["accounts"][$account]['nickname']);
+        $this->connected = true;
     }
 
     /**
      * Logout and disconnect from Whatsapp server
-     * 
+     *
      * @return void
      */
     public function logoutAndDisconnect()
     {
-        if($this->connected  && $this->canLogout)
-        {
-            // Adds some delay defore disconnect
-            sleep(rand(1, 2));
-            
-            $this->offline();
-            $this->whatsProt->disconnect();
+//        if($this->connected)
+//        {
+        // Adds some delay defore disconnect
+        sleep(rand(1, 2));
 
-            $this->connected = false;
-        }
-    }
-    
-    /**
-     * Set connected property
-     *
-     * @param boolean $b
-     * @return void
-     */
-    public function setConnected($b){
-        $this->connected = $b;
-    }
+        $this->offline();
+        $this->whatsProt->disconnect();
 
-    /**
-     * Set if instance can send logoutDisconnect
-     *
-     * @param boolean $b
-     * @return void
-     */
-    public function setCanLogout($b){
-        $this->canLogout = $b;
+        $this->connected = false;
+//        }
     }
 
     /**
@@ -496,6 +486,6 @@ class MGP25 implements WhatsapiInterface
      */
     public function __destruct()
     {
-        $this->logoutAndDisconnect();
+//        $this->logoutAndDisconnect();
     }
 }
