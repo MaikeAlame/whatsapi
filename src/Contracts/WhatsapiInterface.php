@@ -79,6 +79,4 @@ interface WhatsapiInterface
      */
     public function getNewMessages();
     
-    public function setConnected($b);
-    public function setCanLogout($b);
 }
