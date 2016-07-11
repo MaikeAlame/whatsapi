@@ -458,7 +458,6 @@ class MGP25 implements WhatsapiInterface
         $this->whatsProt->sendGetServerProperties();
         $this->whatsProt->sendGetGroups();
         $this->whatsProt->sendGetBroadcastLists();
-        $this->whatsProt->sendSync([]);
         $this->whatsProt->sendAvailableForChat($this->config["accounts"][$account]['nickname']);
         $this->connected = true;
     }
